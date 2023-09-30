@@ -1,6 +1,7 @@
 import { PriceCalculatorForYear2020 } from "./PriceCalculatorForYear2020";
 import { PriceCalculatorForYear2021 } from "./PriceCalculatorForYear2021";
 import { PriceCalculatorForYear2022 } from "./PriceCalculatorForYear2022";
+import { PriceCalculatorStrategyBase } from "./PriceCalculatorStrategyBase";
 
 export type ServiceYear = 2020 | 2021 | 2022;
 export type ServiceType = "Photography" | "VideoRecording" | "BlurayPackage" | "TwoDayEvent" | "WeddingSession";
@@ -22,10 +23,10 @@ export const updateSelectedServices = (
 
 export const calculatePrice = (selectedServices: ServiceType[], selectedYear: ServiceYear) => {
     const strategy = getStrategyForYear(selectedYear);
-    return strategy.calculate(selectedServices);
+    return strategy.calculatePrices(selectedServices);
 };
 
-export function containsRequiredService(service: ServiceType, actual: ServiceType[]): boolean {
+function containsRequiredService(service: ServiceType, actual: ServiceType[]): boolean {
     if (service == "BlurayPackage") {
         return actual.some(s => s == "VideoRecording");
     }
@@ -35,7 +36,7 @@ export function containsRequiredService(service: ServiceType, actual: ServiceTyp
     return true;
 }
 
-export function getRelatedServices(service: ServiceType): ServiceType[] {
+function getRelatedServices(service: ServiceType): ServiceType[] {
     if (service == "VideoRecording") {
         return ["BlurayPackage", "TwoDayEvent"];
     }
@@ -45,7 +46,7 @@ export function getRelatedServices(service: ServiceType): ServiceType[] {
     return [];
 }
 
-function getStrategyForYear(year: ServiceYear) {
+function getStrategyForYear(year: ServiceYear): PriceCalculatorStrategyBase {
     switch (year) {
         case 2020:
             return new PriceCalculatorForYear2020();
@@ -58,8 +59,4 @@ function getStrategyForYear(year: ServiceYear) {
                 message: "Year is not supported"
             };
     }
-}
-
-export interface PriceCalculatorStrategy {
-    calculate(services: ServiceType[]);
 }

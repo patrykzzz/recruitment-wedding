@@ -1,8 +1,8 @@
-import { PriceCalculatorStrategy, ServiceType } from ".";
+import { ServiceType } from ".";
+import { PriceCalculatorStrategyBase } from "./PriceCalculatorStrategyBase";
 
-export class PriceCalculatorForYear2021 implements PriceCalculatorStrategy {
-
-    baseServicePrice: Record<ServiceType, number> = {
+export class PriceCalculatorForYear2021 extends PriceCalculatorStrategyBase {
+    baseServicePrices: Record<ServiceType, number> = {
         Photography: 1800,
         VideoRecording: 1800,
         WeddingSession: 600,
@@ -10,10 +10,7 @@ export class PriceCalculatorForYear2021 implements PriceCalculatorStrategy {
         TwoDayEvent: 400
     };
 
-    calculate(services: ServiceType[]): ({ basePrice: number, finalPrice: number; }) {
-        var basePrice = services.reduce((pv, cv, _, __) => {
-            return this.baseServicePrice[cv] + pv;
-        }, 0);
+    getRebates(services: ServiceType[]): number[] {
         let rebates = [0];
         if (services.includes("Photography") && services.includes("VideoRecording")) {
             rebates = rebates.concat(1300);
@@ -21,8 +18,6 @@ export class PriceCalculatorForYear2021 implements PriceCalculatorStrategy {
         if (services.includes("WeddingSession") && (services.includes("Photography") || services.includes("VideoRecording"))) {
             rebates = rebates.concat(300);
         }
-        const biggestRebate = rebates.sort()[rebates.length - 1];
-
-        return { basePrice, finalPrice: basePrice - biggestRebate };
+        return rebates;
     }
 }
