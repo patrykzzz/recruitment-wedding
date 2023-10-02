@@ -16,10 +16,8 @@ export const updateSelectedServices = (
         }
         return previouslySelectedServices.concat(action.service);
     }
-    const relatedServices = parentToRelatedServices[action.service];
-    const servicesToDeselect = relatedServices.filter(s => getParentServiceCount(s, previouslySelectedServices) > 1)
-        .concat(action.service);
-    return previouslySelectedServices.filter(service => !servicesToDeselect.includes(service));
+    const result = previouslySelectedServices.filter(s => s != action.service);
+    return result.filter(s => containsRequiredService(s, result));
 };
 
 export const calculatePrice = (selectedServices: ServiceType[], selectedYear: ServiceYear) => {
@@ -36,18 +34,6 @@ function containsRequiredService(service: ServiceType, actual: ServiceType[]): b
     }
     return true;
 }
-
-function getParentServiceCount(service: ServiceType, actual: ServiceType[]): number {
-    return actual.filter(s => parentToRelatedServices[s].includes(service)).length;
-}
-
-const parentToRelatedServices: Record<ServiceType, ServiceType[]> = {
-    "VideoRecording": ["BlurayPackage", "TwoDayEvent"],
-    "Photography": ["TwoDayEvent"],
-    "BlurayPackage": [],
-    "TwoDayEvent": [],
-    "WeddingSession": []
-};
 
 function getStrategyForYear(year: ServiceYear): PriceCalculatorStrategyBase {
     switch (year) {
