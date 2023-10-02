@@ -9,9 +9,9 @@ describe("PriceCalculatorStrategyBase", () => {
     });
 
     test.each([
-        [[], 0, 0],
-        [["Photography", "VideoRecording"], 3, 3],
-        [["BlurayPackage", "VideoRecording", "Photography"], 6, 4]
+        [[] as ServiceType[], 0, 0],
+        [["Photography", "VideoRecording"] as ServiceType[], 3, 3],
+        [["BlurayPackage", "VideoRecording", "Photography"] as ServiceType[], 6, 4]
     ])("Calculates prices properly for services: %s", (services: ServiceType[], expectedBasePrice: number, expectedFinalPrice: number) => {
         const result = implementation.calculatePrices(services);
 

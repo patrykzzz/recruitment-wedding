@@ -67,7 +67,7 @@ describe("updateSelectedServices.deselect", () => {
     });
 });
 
-describe.each([2020, 2021, 2022])("calculatePrice.zero (%i)", (year: ServiceYear) => {
+describe.each([2020, 2021, 2022] as ServiceYear[])("calculatePrice.zero (%i)", (year: ServiceYear) => {
     test("should be zero with no services selected", () => {
         const result = calculatePrice([], year);
         expect(result).toEqual({ basePrice: 0, finalPrice: 0 });
@@ -75,15 +75,15 @@ describe.each([2020, 2021, 2022])("calculatePrice.zero (%i)", (year: ServiceYear
 });
 
 describe.each([
-    ["WeddingSession", 2020, 600],
-    ["WeddingSession", 2021, 600],
-    ["WeddingSession", 2022, 600],
-    ["Photography", 2020, 1700],
-    ["Photography", 2021, 1800],
-    ["Photography", 2022, 1900],
-    ["VideoRecording", 2020, 1700],
-    ["VideoRecording", 2021, 1800],
-    ["VideoRecording", 2022, 1900]
+    ["WeddingSession" as ServiceType, 2020 as ServiceYear, 600],
+    ["WeddingSession" as ServiceType, 2021 as ServiceYear, 600],
+    ["WeddingSession" as ServiceType, 2022 as ServiceYear, 600],
+    ["Photography" as ServiceType, 2020 as ServiceYear, 1700],
+    ["Photography" as ServiceType, 2021 as ServiceYear, 1800],
+    ["Photography" as ServiceType, 2022 as ServiceYear, 1900],
+    ["VideoRecording" as ServiceType, 2020 as ServiceYear, 1700],
+    ["VideoRecording" as ServiceType, 2021 as ServiceYear, 1800],
+    ["VideoRecording" as ServiceType, 2022 as ServiceYear, 1900]
 ])("calculatePrice.singleService (%s, %i)", (service: ServiceType, year: ServiceYear, expectedPrice) => {
     test("no discount applied", () => {
         const result = calculatePrice([service], year);
@@ -99,10 +99,10 @@ describe.each([
 });
 
 describe.each([
-    [2020, 300],
-    [2021, 300],
-    [2022, 0]
-])("calcularePrice.photographyWithWeddingSessionPrice (%i increase by %i)", (year: ServiceYear, increase) => {
+    [2020 as ServiceYear, 300],
+    [2021 as ServiceYear, 300],
+    [2022 as ServiceYear, 0]
+])("calculatePrice.photographyWithWeddingSessionPrice (%i increase by %i)", (year: ServiceYear, increase) => {
     test("price matches requirements", () => {
         const withoutSession = calculatePrice(["Photography"], year);
         const withSession = calculatePrice(["Photography", "WeddingSession"], year);
@@ -126,10 +126,10 @@ describe.each([
 });
 
 describe.each([
-    [2020, 300],
-    [2021, 300],
-    [2022, 300]
-])("calcularePrice.videoRecordingWithWeddingSessionPrice (%i increase by %i)", (year: ServiceYear, increase) => {
+    [2020 as ServiceYear, 300],
+    [2021 as ServiceYear, 300],
+    [2022 as ServiceYear, 300]
+])("calculatePrice.videoRecordingWithWeddingSessionPrice (%i increase by %i)", (year: ServiceYear, increase) => {
     test("price matches requirements", () => {
         const withoutSession = calculatePrice(["VideoRecording"], year);
         const withSession = calculatePrice(["VideoRecording", "WeddingSession"], year);
@@ -151,10 +151,10 @@ describe.each([
 });
 
 describe.each([
-    [2020, 500],
-    [2021, 500],
-    [2022, 600]
-])("calcularePrice.videoRecordingWithPhotographyPrice (%i increase by %i)", (year: ServiceYear, increase) => {
+    [2020 as ServiceYear, 500],
+    [2021 as ServiceYear, 500],
+    [2022 as ServiceYear, 600]
+])("calculatePrice.videoRecordingWithPhotographyPrice (%i increase by %i)", (year: ServiceYear, increase) => {
     test("price matches requirements", () => {
         const withoutPhotography = calculatePrice(["VideoRecording"], year);
         const withPhotography = calculatePrice(["VideoRecording", "Photography"], year);
@@ -176,11 +176,11 @@ describe.each([
 });
 
 describe.each([
-    [2020, 300],
-    [2021, 300],
-    [2022, 0]
+    [2020 as ServiceYear, 600],
+    [2021 as ServiceYear, 600],
+    [2022 as ServiceYear, 600]
 ])(
-    "calcularePrice.videoRecordingWithPhotographyWithSessionPrice (%i increase by %i)",
+    "calculatePrice.videoRecordingWithPhotographyWithSessionPrice (%i increase by %i)",
     (year: ServiceYear, increase) => {
         test("price matches requirements", () => {
             const withoutSession = calculatePrice(["VideoRecording", "Photography"], year);
@@ -193,14 +193,14 @@ describe.each([
             expect(priceChangeWithSession).toEqual(increase);
         });
 
-        test("discount applied", () => {
+        test("only video recording and photography discount applied", () => {
             const withoutSession = calculatePrice(["VideoRecording", "Photography"], year);
             const onlySession = calculatePrice(["WeddingSession"], year);
             const withSession = calculatePrice(["VideoRecording", "Photography", "WeddingSession"], year);
 
             const priceWithoutDiscounts = withoutSession.finalPrice + onlySession.finalPrice;
 
-            expect(priceWithoutDiscounts).toBeGreaterThan(withSession.finalPrice);
+            expect(priceWithoutDiscounts).toBe(withSession.finalPrice);
         });
     }
 );
