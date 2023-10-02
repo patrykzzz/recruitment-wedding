@@ -10,14 +10,14 @@ export class PriceCalculatorForYear2020 extends PriceCalculatorStrategyBase {
         TwoDayEvent: 400
     };
 
-    getRebates(services: ServiceType[]): number[] {
-        let rebates = [0];
+    getDiscounts(services: ServiceType[]): number[] {
+        let discounts = [0];
         if (services.includes("Photography") && services.includes("VideoRecording")) {
-            rebates = rebates.concat(1200);
+            discounts = discounts.concat(1200);
         }
         if (services.includes("WeddingSession") && (services.includes("Photography") || services.includes("VideoRecording"))) {
-            rebates = rebates.concat(300);
+            discounts = discounts.concat(300);
         }
-        return rebates;
+        return discounts;
     }
 }

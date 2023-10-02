@@ -11,14 +11,15 @@ export const updateSelectedServices = (
     action: { type: "Select" | "Deselect"; service: ServiceType; }
 ) => {
     if (action.type === "Select") {
-        if (previouslySelectedServices.some(s => s == action.service)) {
+        if (previouslySelectedServices.includes(action.service) || !containsRequiredService(action.service, previouslySelectedServices)) {
             return previouslySelectedServices;
         }
-        if (containsRequiredService(action.service, previouslySelectedServices)) {
-            return previouslySelectedServices.concat(action.service);
-        }
+        return previouslySelectedServices.concat(action.service);
     }
-    return previouslySelectedServices.filter(service => service != action.service && !getRelatedServices(action.service).some(s => s == service));
+    const relatedServices = parentToRelatedServices[action.service];
+    const servicesToDeselect = relatedServices.filter(s => getParentServiceCount(s, previouslySelectedServices) > 1)
+        .concat(action.service);
+    return previouslySelectedServices.filter(service => !servicesToDeselect.includes(service));
 };
 
 export const calculatePrice = (selectedServices: ServiceType[], selectedYear: ServiceYear) => {
@@ -28,23 +29,25 @@ export const calculatePrice = (selectedServices: ServiceType[], selectedYear: Se
 
 function containsRequiredService(service: ServiceType, actual: ServiceType[]): boolean {
     if (service == "BlurayPackage") {
-        return actual.some(s => s == "VideoRecording");
+        return actual.includes("VideoRecording");
     }
     if (service == "TwoDayEvent") {
-        return actual.some(s => s === "VideoRecording") || actual.some(s => s === "Photography");
+        return actual.includes("VideoRecording") || actual.includes("Photography");
     }
     return true;
 }
 
-function getRelatedServices(service: ServiceType): ServiceType[] {
-    if (service == "VideoRecording") {
-        return ["BlurayPackage", "TwoDayEvent"];
-    }
-    if (service == "Photography") {
-        return ["TwoDayEvent"];
-    }
-    return [];
+function getParentServiceCount(service: ServiceType, actual: ServiceType[]): number {
+    return actual.filter(s => parentToRelatedServices[s].includes(service)).length;
 }
+
+const parentToRelatedServices: Record<ServiceType, ServiceType[]> = {
+    "VideoRecording": ["BlurayPackage", "TwoDayEvent"],
+    "Photography": ["TwoDayEvent"],
+    "BlurayPackage": [],
+    "TwoDayEvent": [],
+    "WeddingSession": []
+};
 
 function getStrategyForYear(year: ServiceYear): PriceCalculatorStrategyBase {
     switch (year) {
